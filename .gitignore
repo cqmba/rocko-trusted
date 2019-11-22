@@ -1,0 +1,8 @@
+build/buildhistory
+build/cache
+build/sstate-cache
+build/tmp
+build/workspace
+build/bitbake*
+bitbake-cookerdaemon.log
+!build/conf
