@@ -1,6 +1,6 @@
-LINUX_VERSION ?= "4.14.68"
+LINUX_VERSION ?= "4.14.84"
 
-SRCREV = "8c8666ff6c1254d325cfa300d16f9928b3f31fc0"
+SRCREV = "c28ac2dc08bd73963f953a757a3362c64b5524ed"
 SRC_URI = " \
     git://github.com/raspberrypi/linux.git;branch=rpi-4.14.y \
     file://0001-menuconfig-check-lxdiaglog.sh-Allow-specification-of.patch \

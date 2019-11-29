@@ -39,6 +39,7 @@ do_install() {
     cp -r ${WORKDIR}/sessions/* ${D}/home/root/scripts/sessions
     cp -r ${WORKDIR}/signature/* ${D}/home/root/scripts/signature
     cp -r ${WORKDIR}/tpm2_start.sh ${D}/home/root/scripts
+    cp -r ${WORKDIR}/getconfig.sh ${D}/home/root/scripts
 }
 FILES_${PN} += "\
 /home/root/* \
