@@ -40,7 +40,11 @@ do_install() {
     cp -r ${WORKDIR}/signature/* ${D}/home/root/scripts/signature
     cp -r ${WORKDIR}/tpm2_start.sh ${D}/home/root/scripts
     cp -r ${WORKDIR}/getconfig.sh ${D}/home/root/scripts
+    install -d ${D}/etc/udev/rules.d
+    install -m 0644 ${WORKDIR}/tpm-udev.rules ${D}/etc/udev/rules.d/50-tpm-udev.rules
 }
+
 FILES_${PN} += "\
+/etc/udev/rules.d/50-tpm-udev.rules \
 /home/root/* \
 "

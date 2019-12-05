@@ -18,8 +18,19 @@ S = "${WORKDIR}/${BPN}-${PV}"
 
 EXTRA_OECONF += "--disable-doxygen-doc"
 
+EXTRA_OECONF += "--with-udevrulesdir=${base_prefix}/etc/udev/rules.d/ --with-udevrulesprefix=50-"
+# --with-ptpm=${base_prefix}/dev/tpm0
+
+
+INHERIT += "extrausers"
+EXTRA_USERS_PARAMS = "\
+	useradd --system --user-group tss; \
+	usermod -a -G tss tss; \
+	"
+
 PROVIDES = "${PACKAGES}"
 PACKAGES = " \
+    ${PN} \
     ${PN}-dbg \
     ${PN}-doc \
     libtss2 \
@@ -72,5 +83,12 @@ FILES_libtss2-doc = " \
     ${mandir}/man3 \
     ${mandir}/man7 \
 "
+
+FILES_${PN} = "${etcdir}/udev ${base_prefix}/etc/udev ${base_prefix}/etc/udev/50-tpm-udev.rules"
+
+do_install_append() {
+        install -m 0644 ${WORKDIR}/tpm2-tss-2.3.1/dist/tpm-udev.rules ${D}/etc/udev/rules.d/50-tpm-udev.rules
+	
+}
 
 inherit autotools pkgconfig
