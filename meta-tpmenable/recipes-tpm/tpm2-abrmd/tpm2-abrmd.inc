@@ -24,19 +24,22 @@ EXTRA_OECONF += " \
 "
 
 S = "${WORKDIR}/${BPN}-${PV}"
-inherit autotools pkgconfig systemd update-rc.d useradd extrausers
+inherit autotools pkgconfig systemd update-rc.d useradd
 
 SYSTEMD_PACKAGES = "${PN}"
 SYSTEMD_SERVICE_${PN} = "tpm2-abrmd.service"
+SYSTEMD_AUTO_ENABLE_${PN} = "disable"
 
 INITSCRIPT_NAME = "tpm2-abrmd"
 INITSCRIPT_PARAMS = "start 99 2 3 4 5 . stop 19 0 1 6 ."
 
 USERADD_PACKAGES = "${PN}"
-USERADD_PARAM_${PN} = "--system --user-group tss"
-EXTRA_USERS_PARAMS = "usermod -a -G tss tss"
-#GROUPADD_PARAM_${PN} = "tss"
-#USERADD_PARAM_${PN} = "-M -d /var/lib/tpm -s /bin/false -g tss tss"
+GROUPADD_PARAM_${PN} = "tss"
+USERADD_PARAM_${PN} = "--system -M -d /var/lib/tpm -s /bin/false -g tss tss"
+
+
+PACKAGECONFIG ?="${@bb.utils.contains('DISTRO_FEATURES','systemd','systemd', '', d)}"
+PACKAGECONFIG[systemd] = "--with-systemdsystemunitdir=${systemd_system_unitdir}, --with-systemdsystemunitdir=no"
 
 do_install_append() {
         install -d ${D}${sysconfdir}/init.d
