@@ -1,0 +1,25 @@
+From d84c102ae40435a6806c7985b7a543ad7a42131d Mon Sep 17 00:00:00 2001
+From: Markus Bartels <markus.bartels@carmeq.com>
+Date: Wed, 15 Jan 2020 12:41:23 +0100
+Subject: [PATCH] use postcore_initcall for the clock driver
+
+---
+ drivers/clk/bcm/clk-bcm2835.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/clk/bcm/clk-bcm2835.c b/drivers/clk/bcm/clk-bcm2835.c
+index 7cdd597f1a40..ad95ded8ae89 100644
+--- a/drivers/clk/bcm/clk-bcm2835.c
++++ b/drivers/clk/bcm/clk-bcm2835.c
+@@ -2330,7 +2330,7 @@ static int __init __bcm2835_clk_driver_init(void)
+ {
+ 	return platform_driver_register(&bcm2835_clk_driver);
+ }
+-subsys_initcall(__bcm2835_clk_driver_init);
++postcore_initcall(__bcm2835_clk_driver_init);
+ 
+ MODULE_AUTHOR("Eric Anholt <eric@anholt.net>");
+ MODULE_DESCRIPTION("BCM2835 clock driver");
+-- 
+2.17.1
+

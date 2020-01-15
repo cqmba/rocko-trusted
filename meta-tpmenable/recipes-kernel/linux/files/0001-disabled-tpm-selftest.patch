@@ -1,0 +1,26 @@
+From 5242da9e7eef171e6161845b608af745bcf9ee48 Mon Sep 17 00:00:00 2001
+From: Markus Bartels <markus.bartels@carmeq.com>
+Date: Wed, 18 Dec 2019 12:29:35 +0100
+Subject: [PATCH] disabled tpm selftest
+
+---
+ drivers/char/tpm/tpm2-cmd.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/char/tpm/tpm2-cmd.c b/drivers/char/tpm/tpm2-cmd.c
+index 44a3d16231f6..e5b3bb1dbdb1 100644
+--- a/drivers/char/tpm/tpm2-cmd.c
++++ b/drivers/char/tpm/tpm2-cmd.c
+@@ -1088,7 +1088,8 @@ int tpm2_auto_startup(struct tpm_chip *chip)
+ 	if (rc)
+ 		goto out;
+ 
+-	rc = tpm2_do_selftest(chip);
++	//rc = tpm2_do_selftest(chip);
++	rc = 0;
+ 	if (rc != 0 && rc != TPM2_RC_INITIALIZE) {
+ 		dev_err(&chip->dev, "TPM self test failed\n");
+ 		goto out;
+-- 
+2.17.1
+
