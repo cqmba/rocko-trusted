@@ -1,4 +1,6 @@
-CMDLINE_append +="audit=0 ima_appraise=fix ima_policy=tcb ima_policy=appraise_tcb"
+CMDLINE_append +="audit=0 ima_policy=tcb"
+#First safe integration of appraise  ima_appraise=fix
+#  ima_policy=appraise_tcb
 
 FILESEXTRAPATHS_prepend := "${THISDIR}/linux:"
 
