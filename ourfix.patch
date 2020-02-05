@@ -1,0 +1,26 @@
+diff --git a/drivers/clk/bcm/clk-bcm2835.c b/drivers/clk/bcm/clk-bcm2835.c
+index d6caac9c32bd..ad95ded8ae89 100644
+--- a/drivers/clk/bcm/clk-bcm2835.c
++++ b/drivers/clk/bcm/clk-bcm2835.c
+@@ -2330,7 +2330,7 @@ static int __init __bcm2835_clk_driver_init(void)
+ {
+ 	return platform_driver_register(&bcm2835_clk_driver);
+ }
+-core_initcall(__bcm2835_clk_driver_init);
++postcore_initcall(__bcm2835_clk_driver_init);
+ 
+ MODULE_AUTHOR("Eric Anholt <eric@anholt.net>");
+ MODULE_DESCRIPTION("BCM2835 clock driver");
+diff --git a/drivers/firmware/raspberrypi.c b/drivers/firmware/raspberrypi.c
+index a82819a78f53..dfa362e1c7c2 100644
+--- a/drivers/firmware/raspberrypi.c
++++ b/drivers/firmware/raspberrypi.c
+@@ -457,7 +457,7 @@ static int __init rpi_firmware_init(void)
+ out1:
+ 	return ret;
+ }
+-subsys_initcall(rpi_firmware_init);
++core_initcall(rpi_firmware_init);
+ 
+ static void __init rpi_firmware_exit(void)
+ {
