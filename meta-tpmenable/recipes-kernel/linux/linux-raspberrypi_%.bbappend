@@ -1,5 +1,4 @@
-CMDLINE_append +="ima_appraise=fix ima_policy=tcb evm=fix audit=0"
-# ima_policy=appraise_tcb
+CMDLINE_append +="rootflags=i_version ima_appraise=fix ima_policy=tcb ima_policy=appraise_tcb evm=fix audit=0"
 
 FILESEXTRAPATHS_prepend := "${THISDIR}/linux:"
 
