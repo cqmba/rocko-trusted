@@ -6,3 +6,10 @@ build/workspace
 build/bitbake*
 bitbake-cookerdaemon.log
 !build/conf
+build/conf/devtool.conf
+*.der
+*.pem
+*.genkey
+*.srl
+*.x509
+*.priv
