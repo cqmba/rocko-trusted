@@ -1,0 +1,40 @@
+diff --git a/src/evmctl.c b/src/evmctl.c
+index 2ffee78..2e32e8e 100644
+--- a/src/evmctl.c
++++ b/src/evmctl.c
+@@ -632,7 +632,7 @@ static int get_file_type(const char *path, const char *search_type)
+ static int do_cmd(struct command *cmd, find_cb_t func)
+ {
+ 	char *path = g_argv[optind++];
+-	int err, dts = REG_MASK; /* only regular files by default */
++	int err = 0, dts = REG_MASK; /* only regular files by default */
+ 
+ 	if (!path) {
+ 		log_err("Parameters missing\n");
+@@ -640,15 +640,18 @@ static int do_cmd(struct command *cmd, find_cb_t func)
+ 		return -1;
+ 	}
+ 
+-	if (recursive) {
+-		if (search_type) {
+-			dts = get_file_type(path, search_type);
+-			if (dts < 0)
+-				return dts;
++	while (path && !err) {
++		if (recursive) {
++			if (search_type) {
++				dts = get_file_type(path, search_type);
++				if (dts < 0)
++					return dts;
++			}
++			err = find(path, dts, func);
++		} else {
++			err = func(path);
+ 		}
+-		err = find(path, dts, func);
+-	} else {
+-		err = func(path);
++		path = g_argv[optind++];
+ 	}
+ 
+ 	return err;

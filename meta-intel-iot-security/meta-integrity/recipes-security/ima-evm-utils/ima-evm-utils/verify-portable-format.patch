@@ -1,0 +1,13 @@
+diff --git a/src/evmctl.c b/src/evmctl.c
+index 2ffee78..8f853b2 100644
+--- a/src/evmctl.c
++++ b/src/evmctl.c
+@@ -760,7 +763,7 @@ static int verify_evm(const char *file)
+ 		return len;
+ 	}
+ 
+-	if (sig[0] != 0x03) {
++	if ((sig[0] != 0x03) & (sig[0] != 0x05)) {
+ 		log_err("security.evm has no signature\n");
+ 		return -1;
+ 	}
