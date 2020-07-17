@@ -65,17 +65,27 @@ ima_evm_sign_rootfs () {
        perl -pi -e 's;(\S+)(\s+)(${@"|".join((d.getVar("IMA_EVM_ROOTFS_IVERSION", True) or "no-such-mount-point").split())})(\s+)(\S+)(\s+)(\S+);\1\2\3\4\5\6\7,iversion;; s/(,iversion)+/,iversion/;' etc/fstab
     fi
 
-    # Sign file with private IMA key. EVM not supported at the moment.
-    bbnote "IMA/EVM: signing files 'find ${IMA_EVM_ROOTFS_SIGNED}' with private key '${IMA_EVM_PRIVKEY}'"
-    find ${IMA_EVM_ROOTFS_SIGNED} | xargs -d "\n" --no-run-if-empty --verbose evmctl -a sha256 sign --m32 --imasig --portable --key ${IMA_EVM_PRIVKEY}
-    bbnote "IMA/EVM: hashing files 'find ${IMA_EVM_ROOTFS_HASHED}'"
-    find ${IMA_EVM_ROOTFS_HASHED} | xargs -d "\n" --no-run-if-empty --verbose evmctl ima_hash
+    # Sign file with private IMA key. EVM not supported at the moment. 
+    # The default hash was sha1, here sha256 is enabled.
+    #bbnote "IMA/EVM: signing files 'find ${IMA_EVM_ROOTFS_SIGNED}' with private key '${IMA_EVM_PRIVKEY}'"
+    #find ${IMA_EVM_ROOTFS_SIGNED} | xargs -d "\n" --no-run-if-empty --verbose evmctl -a sha256 ima_sign --key ${IMA_EVM_PRIVKEY}
+    #bbnote "IMA/EVM: hashing files 'find ${IMA_EVM_ROOTFS_HASHED}'"
+    #find ${IMA_EVM_ROOTFS_HASHED} | xargs -d "\n" --no-run-if-empty --verbose evmctl -a sha256 ima_hash
+
+    # Sign file with private IMA and EVM key. IMA and EVM use the same key at the moment
+    # The default hash was sha1, here sha256 is enabled.
+    bbnote "IMA and EVM: signing files 'find ${IMA_EVM_ROOTFS_SIGNED}' with private key '${IMA_EVM_PRIVKEY}'"
+    find ${IMA_EVM_ROOTFS_SIGNED} | xargs -d "\n" --no-run-if-empty --verbose evmctl sign --m32 -a sha256 -o --imasig --key ${IMA_EVM_PRIVKEY}
+    bbnote "IMA: hashing files 'find ${IMA_EVM_ROOTFS_HASHED}'"
+    find ${IMA_EVM_ROOTFS_HASHED} | xargs -d "\n" --no-run-if-empty --verbose evmctl -a sha256 ima_hash
 
     # Optionally install custom policy for loading by systemd.
     if [ "${IMA_EVM_POLICY_SYSTEMD}" ]; then
         install -d ./${sysconfdir}/ima
         rm -f ./${sysconfdir}/ima/ima-policy
         install "${IMA_EVM_POLICY_SYSTEMD}" ./${sysconfdir}/ima/ima-policy
+        # Sign the policy
+        evmctl -a sha256 ima_sign --key ${IMA_EVM_PRIVKEY} ./${sysconfdir}/ima/ima-policy
     fi
 }
 
