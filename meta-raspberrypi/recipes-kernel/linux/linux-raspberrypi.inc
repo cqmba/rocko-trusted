@@ -100,6 +100,10 @@ do_configure_prepend() {
 
     # Localversion
     kernel_configure_variable LOCALVERSION "\"\""
+    # Enable INITRAMFS
+    kernel_configure_variable BLK_DEV_INITRD y
+    kernel_configure_variable INITRAMFS_SOURCE “”
+    kernel_configure_variable RD_GZIP y
 
     if [ ! -z "${KERNEL_INITRAMFS}" ]; then
         kernel_configure_variable OVERLAY_FS y
