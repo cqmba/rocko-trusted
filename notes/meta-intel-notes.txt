@@ -1,0 +1,61 @@
+meta-security-framework
+	classes/xattr-images.bbclass
+		-> enables xattr image support (preservation) in tar images
+	recipes-devtools/e2fsprogs
+		-> enables ext2 filesystem utilities (unneeded?)
+	recipes-kernel/linux
+		-> adds kernel fragments
+	recipes-security/
+		audit
+			-> userspace tools for auditing
+		keyutils
+			-> userspace tools for key management
+		libcap-ng
+			-> alternative libary for working with Posix Capabilities
+		smacknet
+			-> install systemd-service smacknet.service for Smack Network Labels Configuration
+
+
+meta-security-smack
+	classes/deploy-files.bbclass
+		-> deploys files (unknown why this is needed)
+	recipes-connectivity/
+		bluez5
+			-> install with CapabilityBoundingSet=CAP_MAC_OVERRIDE (see AGL)
+		connman 
+			-> install with CapabilityBoundingSet=CAP_MAC_OVERRIDE (see AGL) [not included in CDIS]
+	recipes-core/
+		base-files
+			-> installs /etc/smack/accesses.d/default-access-domains
+			-> installs /usr/lib/tmpfiles.d/packet-forwarding.conf
+			-> installs /lib/udev/rules.d/85-netdev-ipconf-smacklabel.rules
+			-> changes label of /etc; /var; /tmp;
+		coreutils
+			-> sets configure flag --enable-libsmack
+		systemd
+			-> smack patches can be added with SYSTEMD_SMACK_PATCHES_[version], while for systemd >= 229 this should be unnecessary
+			-> sets configure flag --with-smack-run-label=System
+			-> [Labeling /var/tmp and /var/log as System::Log] : installs file to /{systemd_unitdir}/system/systemd-tmpfiles-setup.service.d/smack.conf
+			-> [Fix busybox boot problem by adding smackfsroot*] :  installs file to /{systemd_unitdir}/system/tmp.mount.d/smack.conf
+			-> [Run systemd-journald with ^ Label] : installs file to /{systemd_unitdir}/system/journald.service.d/smack.conf
+			-> Patches systemd source files to add Handling of /run and /sys/fs/cgroup
+		util-linux
+			-> adds the packageconfig flag --with-smack to enable special support in libmount for smack mount options
+	recipes-kernel/linux
+		-> adds kernel fragments
+	recipes-security/
+		smack-userspace
+			-> adds smack userspace tools
+
+
+WARNING: minicate-debug-1.0-r0 do_rootfs: Intentionally failing postinstall scriptlets of ['base-files'] to defer them to first boot is deprecated. Please place them into pkg_postinst_ontarget_${PN} ().
+If deferring to first boot wasn't the intent, then scriptlet failure may mean an issue in the recipe, or a regression elsewhere.
+Details of the failure are in /home/markus/yocto-toolchain/build/out_minicate-zynq7/work/minicate_zynq7-poky-linux-gnueabi/minicate-debug/1.0-r0/temp/log.do_rootfs.
+WARNING: minicate-debug-1.0-r0 do_rootfs: [log_check] minicate-debug: found 2 warning messages in the logfile:
+[log_check] warning: %post(base-files-3.0.14-r89.minicate_zynq7) scriptlet failed, exit status 127
+[log_check] WARNING: Intentionally failing postinstall scriptlets of ['base-files'] to defer them to first boot is deprecated. Please place them into pkg_postinst_ontarget_${PN} ().
+
+PATH=/home/markus/yocto-toolchain/build/out_minicate-zynq7/sysroots-uninative/x86_64-linux/usr/bin:/home/markus/yocto-toolchain/build/out_minicate-zynq7/work/minicate_zynq7-poky-linux-gnueabi/minicate-debug/1.0-r0/recipe-sysroot-native/usr/bin/python3-native:/home/markus/yocto-toolchain/build/out_minicate-zynq7/work/minicate_zynq7-poky-linux-gnueabi/minicate-debug/1.0-r0/recipe-sysroot-native/usr/bin/python3-native:/home/markus/yocto-toolchain/external/poky/scripts:/home/markus/yocto-toolchain/build/out_minicate-zynq7/work/minicate_zynq7-poky-linux-gnueabi/minicate-debug/1.0-r0/recipe-sysroot-native/usr/bin/arm-poky-linux-gnueabi:/home/markus/yocto-toolchain/build/out_minicate-zynq7/work/minicate_zynq7-poky-linux-gnueabi/minicate-debug/1.0-r0/recipe-sysroot/usr/bin/crossscripts:/home/markus/yocto-toolchain/build/out_minicate-zynq7/work/minicate_zynq7-poky-linux-gnueabi/minicate-debug/1.0-r0/recipe-sysroot-native/usr/sbin:/home/markus/yocto-toolchain/build/out_minicate-zynq7/work/minicate_zynq7-poky-linux-gnueabi/minicate-debug/1.0-r0/recipe-sysroot-native/usr/bin:/home/markus/yocto-toolchain/build/out_minicate-zynq7/work/minicate_zynq7-poky-linux-gnueabi/minicate-debug/1.0-r0/recipe-sysroot-native/sbin:/home/markus/yocto-toolchain/build/out_minicate-zynq7/work/minicate_zynq7-poky-linux-gnueabi/minicate-debug/1.0-r0/recipe-sysroot-native/bin:/home/markus/yocto-toolchain/external/poky/bitbake/bin:/home/markus/yocto-toolchain/build/out_minicate-zynq7/hosttools
+
+
+		

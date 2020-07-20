@@ -1,0 +1,77 @@
+Prerequisites:
+Linux Kernel 4.14.84 (Raspberry Pi)
+Filesystem: ext4 (should support i_version, which ima depends upon)
+
+cat /etc/fstab
+mount | grep data
+cat /proc/mounts
+Kernel Config:
+
+CONFIG_HW_RANDOM_TPM=y
+CONFIG_TCG_TPM=y
+CONFIG_TCG_TIS_CORE=y
+CONFIG_TCG_TIS=y
+CONFIG_TCG_TIS_SPI=y
+CONFIG_ACPI=y
+CONFIG_TCG_CRB=y
+CONFIG_SECURITYFS=y
+
+CONFIG_SYSTEM_TRUSTED_KEYRING=y
+
+#IMA
+CONFIG_AUDIT=y
+CONFIG_IMA_AUDIT=y
+CONFIG_IMA_LSM_RULES=y -> not in actual config
+#EVM
+CONFIG_TRUSTED_KEYS=y
+CONFIG_ENCRYPTED_KEYS=y
+CONFIG_EVM=y
+
+further config (observed not compiled explicitely)
+
+CONFIG_INTEGRITY=y
+CONFIG_INTEGRITY_SIGNATURE=y
+CONFIG_INTEGRITY_ASYMMETRIC_KEYS=y
+CONFIG_INTEGRITY_TRUSTED_KEYRING=y
+CONFIG_INTEGRITY_AUDIT=y
+CONFIG_IMA_MEASURE_PCR_IDX=10
+CONFIG_IMA_NG_TEMPLATE=y
+CONFIG_IMA_DEFAULT_TEMPLATE="ima-ng"
+CONFIG_IMA_DEFAULT_HASH_SHA1=y
+CONFIG_IMA_DEFAULT_HASH="sha1"
+
+
+Note that currently the default IMA hash algorithm is sha1, which is unsecure
+
+Note that digital signatures should only be used for files that dont change (since the private key is not kept on the system) (see https://en.opensuse.org/SDB:Ima_evm)
+
+
+Observations
+ima_appraise=fix ima_policy=tcb evm=fix audit=0 
+* asci_measurements is populated and each file added by system has a security.ima xattr
+* adding a /home/root/test.txt adds it to the ascii_measurements list, however hash doesnt change when echo "1" > test.txt
+* after rebooting custom /home/root/test.txt is missing from ascii_measurements
+* manually added evctl ima_hash test.txt is much shorter
+* custom added file has no xattr after creation
+* evmctl ima_measurement fails with :Unable to open /sys/class/misc/tpm0/device/pcrs PCRAgg does not match PCR-10
+
+ima_policy=tcb ima_policy=appraise_tcb evm=fix audit=0
+* kernel panic, init not found
+
+ima_appraise=fix ima_policy=tcb ima_policy=appraise_tcb evm=fix audit=0
+* getting flooded with "integrity: Request for unknown key 'id:52626563' err -11
+* cat /proc/keys shows keyring .ima:empty; keyring .evm: empty
+* new files automatically get a security.ima xattr
+
+
+IMA_EVM_POLICY_SYSTEMD = "${IMA_EVM_BASE}/data/ima_policy_hashed"
+* no integrity kernel spam
+* ascii-measurements is much smaller, only lik 10 entries
+* /etc/ima/ima-policy now exits and contains the policy while /sys/kernel/security/ima/policy does not exist
+* getfattr does not seem to show any xattrs
+
+
+IMA_LOAD_X059 added
+ima-gen-local-ca.sh then ima-gen-CA-signed.sh
+2 ima files in KEY_DIR, CA x509 in ROOT_CA 
+

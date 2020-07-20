@@ -1,0 +1,33 @@
+						Default Kernel Config	Extended
+						(enabled IMA)
+
+IMA:
+CONFIG_INTEGRITY=y			 	| set
+CONFIG_IMA=y					| set
+CONFIG_IMA_MEASURE_PCR_IDX=10			| set
+CONFIG_AUDIT					| not set   		| yes
+CONFIG_IMA_AUDIT=y				| not set   		| not included
+CONFIG_IMA_LSM_RULES=y 				| not included 		| not included
+
+IMA-appraisal:
+CONFIG_INTEGRITY_SIGNATURE=y			| set
+CONFIG_INTEGRITY=y				| set
+CONFIG_IMA_APPRAISE=y				| set
+
+CONFIG_TCG_TPM=y				| set
+CONFIG_KEYS=y					| set
+CONFIG_TRUSTED_KEYS=y				| not set  		| yes
+CONFIG_ENCRYPTED_KEYS=y				| not set  		| yes
+CONFIG_INTEGRITY_SIGNATURE=y			| set
+CONFIG_INTEGRITY=y				| set
+CONFIG_EVM=y					| not set  		| yes
+
+Note 
+IMA_NG_TEMPLATE is set y
+IMA_DEFAULT_TEMPLATE="ima-ng"
+IMA_DEFAULT_HASH="sha1"
+IMA_APPRAISE_BOOTPARAM=y
+
+tpm2_pcrextend 23:sha1=$(tpm2_hash -C e -g sha1 test.txt | hexdump -e '"%x"')
+tpm2_pcrreset 23
+tpm2_pcrread
