@@ -1,0 +1,4 @@
+bitbake core-image-base
+cp ~/<build-dir>/tmp/deploy/images/raspberrypi3/image-initramfs....<real file, not symlinked>.cpio.gz -> mounted boot partion
+add the following to config.txt:
+initramfs <initramfs-filename in boot partition>.cpio.gz 

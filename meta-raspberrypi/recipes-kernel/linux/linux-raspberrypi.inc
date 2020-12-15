@@ -16,9 +16,14 @@ SRC_URI += "file://rpi-kernel-misc.cfg"
 KCONFIG_MODE = "--alldefconfig"
 KBUILD_DEFCONFIG_raspberrypi0-wifi ?= "bcmrpi_defconfig"
 KBUILD_DEFCONFIG_raspberrypi ?= "bcmrpi_defconfig"
+KBUILD_DEFCONFIG_raspberrypi-cm3 ?= "bcm2709_defconfig"
 KBUILD_DEFCONFIG_raspberrypi2 ?= "bcm2709_defconfig"
 KBUILD_DEFCONFIG_raspberrypi3 ?= "bcm2709_defconfig"
 KBUILD_DEFCONFIG_raspberrypi3-64 ?= "bcmrpi3_defconfig"
+KBUILD_DEFCONFIG_raspberrypi4 ?= "bcm2711_defconfig"
+KBUILD_DEFCONFIG_raspberrypi4-64 ?= "bcm2711_defconfig"
+
+LINUX_VERSION_EXTENSION ?= ""
 
 # CMDLINE for raspberrypi
 SERIAL = "${@oe.utils.conditional("ENABLE_UART", "1", "console=serial0,115200", "", d)}"
@@ -34,8 +39,6 @@ CMDLINE_append += ' ${@oe.utils.conditional("DISABLE_RPI_BOOT_LOGO", "1", "logo.
 # to enable kernel debugging.
 CMDLINE_DEBUG ?= ""
 CMDLINE_append = " ${CMDLINE_DEBUG}"
-
-KERNEL_INITRAMFS ?= '${@oe.utils.conditional("INITRAMFS_IMAGE_BUNDLE", "1", "1", "", d)}'
 
 KERNEL_MODULE_AUTOLOAD += "${@bb.utils.contains("MACHINE_FEATURES", "pitft28r", "stmpe-ts", "", d)}"
 
@@ -98,14 +101,13 @@ do_configure_prepend() {
     mv -f ${B}/.config ${B}/.config.patched
     CONF_SED_SCRIPT=""
 
-    # Localversion
-    kernel_configure_variable LOCALVERSION "\"\""
+    
     # Enable INITRAMFS
     kernel_configure_variable BLK_DEV_INITRD y
     kernel_configure_variable INITRAMFS_SOURCE “”
     kernel_configure_variable RD_GZIP y
 
-    if [ ! -z "${KERNEL_INITRAMFS}" ]; then
+    if [ "${INITRAMFS_IMAGE_BUNDLE}" = "1" ]; then
         kernel_configure_variable OVERLAY_FS y
         kernel_configure_variable SQUASHFS y
         kernel_configure_variable UBIFS_FS y
@@ -113,7 +115,7 @@ do_configure_prepend() {
 
     # Activate the configuration options for VC4
     VC4GRAPHICS="${@bb.utils.contains("MACHINE_FEATURES", "vc4graphics", "1", "0", d)}"
-    if [ ${VC4GRAPHICS} = "1" ]; then
+    if [ "${VC4GRAPHICS}" = "1" ]; then
         kernel_configure_variable I2C_BCM2835 y
         kernel_configure_variable DRM y
         kernel_configure_variable DRM_FBDEV_EMULATION y
@@ -126,9 +128,11 @@ do_configure_prepend() {
     rm -f ${B}/.config.patched
 }
 
-do_compile_append_raspberrypi3-64() {
-    cc_extra=$(get_cc_option)
-    oe_runmake dtbs CC="${KERNEL_CC} $cc_extra " LD="${KERNEL_LD}" ${KERNEL_EXTRA_ARGS}
+do_compile_append() {
+    if [ "${SITEINFO_BITS}" = "64" ]; then
+        cc_extra=$(get_cc_option)
+        oe_runmake dtbs CC="${KERNEL_CC} $cc_extra " LD="${KERNEL_LD}" ${KERNEL_EXTRA_ARGS}
+    fi
 }
 
 do_deploy_append() {
